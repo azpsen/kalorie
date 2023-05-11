@@ -33,7 +33,11 @@ pub struct DailyInfo {
 }
 
 pub struct SettingsManager {
-  pub settings: HashMap<String, [String; 2]>,
+  pub settings: HashMap<String, String>,
+}
+
+pub struct EntryManager {
+  pub entries: HashMap<String, String>,
 }
 
 pub struct DatabaseManager {

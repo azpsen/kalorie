@@ -30,8 +30,4 @@ impl DatabaseManager {
   pub fn get_settings(&self) -> Result<HashMap<String, String>, Error> {
     self.settings.get()
   }
-
-  pub fn get_name_from_id(&self, id: String) -> Result<String, Error> {
-    self.settings.get_name(id)
-  }
 }
