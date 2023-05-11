@@ -15,7 +15,7 @@ fn main() -> Result<(), Error> {
   println!("Loaded settings:\n{:#?}", settings);
   println!("\nChanging settings...\n");
 
-  settings.insert("Name".to_string(), "Hello, World!".to_string());
+  settings.get_mut("name").unwrap().value = "Hello, World!".to_string();
   db_man.write_settings(&settings)?;
 
   println!("Changed settings to:\n{:#?}\n", settings);

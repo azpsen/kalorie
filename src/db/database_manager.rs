@@ -23,11 +23,11 @@ impl DatabaseManager {
     self.settings.load(&self.conn)
   }
 
-  pub fn write_settings(&mut self, settings: &HashMap<String, String>) -> Result<(), Error> {
+  pub fn write_settings(&mut self, settings: &HashMap<String, SettingsEntry>) -> Result<(), Error> {
     self.settings.write(settings, &self.conn)
   }
 
-  pub fn get_settings(&self) -> Result<HashMap<String, String>, Error> {
+  pub fn get_settings(&self) -> Result<HashMap<String, SettingsEntry>, Error> {
     self.settings.get()
   }
 }

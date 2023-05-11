@@ -32,8 +32,15 @@ pub struct DailyInfo {
   pub entries: Vec<Entry>,
 }
 
+#[derive(Debug, Clone)]
+pub struct SettingsEntry {
+  pub name: String,
+  pub value: String,
+  pub visible: bool,
+}
+
 pub struct SettingsManager {
-  pub settings: HashMap<String, String>,
+  pub settings: HashMap<String, SettingsEntry>,
 }
 
 pub struct EntryManager {
