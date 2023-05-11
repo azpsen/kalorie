@@ -93,23 +93,17 @@ impl SettingsManager {
     Ok(self.settings.clone())
   }
 
-  pub fn write(
-    &mut self,
-    settings: &HashMap<String, SettingsEntry>,
-    conn: &Connection,
-  ) -> Result<(), Error> {
-    for (k, v) in settings {
-      let mut stmt = conn.prepare(
-        "update settings set
-          name=?1,
-          value=?2,
-          visible=?3
-        where id=?4",
-      )?;
-      stmt.execute((v.clone().name, v.clone().value, v.visible, k))?; // TODO find more mem-efficient solution
+  pub fn write(&mut self, id: &str, val: &str, conn: &Connection) -> Result<(), Error> {
+    // Update DB
+    let mut stmt = conn.prepare(
+      "update settings set
+          value=?1,
+        where id=?2",
+    )?;
+    stmt.execute((id, val))?;
 
-      self.settings.insert(k.to_string(), v.clone());
-    }
+    // Update local settings map
+    self.settings.get_mut(id).unwrap().value = val.to_string();
 
     Ok(())
   }

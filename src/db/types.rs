@@ -1,6 +1,6 @@
+use chrono::{DateTime, Utc};
 use rusqlite::Connection;
 use std::collections::HashMap;
-use std::vec;
 
 #[derive(Debug, Clone)]
 pub struct UserSettings {
@@ -12,24 +12,24 @@ pub struct UserSettings {
 
 #[derive(Debug)]
 pub struct NutritionData {
+  pub id: u16,
   pub name: String,
   pub calories: u16,
   pub carbs: u16,
   pub sodium: u16,
 }
 
-#[derive(Debug)]
-pub struct Entry {
-  pub id: u16,
+#[derive(Debug, Clone)]
+pub struct FoodEntry {
   pub name: String,
-  pub time: String,
-  pub nutrition: NutritionData,
+  pub datetime: DateTime<Utc>,
+  pub nutrition: u16,
 }
 
 #[derive(Debug)]
 pub struct DailyInfo {
   pub date: String,
-  pub entries: Vec<Entry>,
+  pub entries: Vec<FoodEntry>,
 }
 
 #[derive(Debug, Clone)]
@@ -43,8 +43,8 @@ pub struct SettingsManager {
   pub settings: HashMap<String, SettingsEntry>,
 }
 
-pub struct EntryManager {
-  pub entries: HashMap<String, String>,
+pub struct JournalManager {
+  pub journal: HashMap<u16, FoodEntry>,
 }
 
 pub struct DatabaseManager {
