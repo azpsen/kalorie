@@ -8,19 +8,19 @@ mod ui;
 
 fn main() -> Result<(), Error> {
   // Load database
-  let mut db_man = DatabaseManager::new("kalorie.db".to_string());
+  let mut db_man = DatabaseManager::new("kalorie.db".to_string())?;
 
   db_man.load_settings()?;
   let mut settings = db_man.settings.get()?;
-  println!("Loaded settings: \n{:#?}", settings);
-  println!("Changing settings...");
+  println!("Loaded settings:\n{:#?}", settings);
+  println!("\nChanging settings...\n");
 
-  settings.name = "Hello, world!".to_string();
+  settings.insert("name".to_string(), "Hello, World!".to_string());
   db_man.write_settings(&settings)?;
 
-  println!("Changed settings to {:#?}", settings);
+  println!("Changed settings to:\n{:#?}\n", settings);
   settings = db_man.get_settings()?;
-  println!("Loaded settings: {:#?}", settings);
+  println!("Loaded settings:\n{:#?}\n", settings);
 
   Ok(())
 }

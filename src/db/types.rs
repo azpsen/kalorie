@@ -1,4 +1,5 @@
 use rusqlite::Connection;
+use std::collections::HashMap;
 use std::vec;
 
 #[derive(Debug, Clone)]
@@ -32,7 +33,7 @@ pub struct DailyInfo {
 }
 
 pub struct SettingsManager {
-  pub settings: UserSettings,
+  pub settings: HashMap<String, [String; 2]>,
 }
 
 pub struct DatabaseManager {
