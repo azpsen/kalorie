@@ -97,7 +97,7 @@ impl SettingsManager {
     // Update DB
     let mut stmt = conn.prepare(
       "update settings set
-          value=?1,
+          value=?1
         where id=?2",
     )?;
     stmt.execute((id, val))?;
