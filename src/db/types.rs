@@ -23,7 +23,7 @@ pub struct NutritionData {
 pub struct FoodEntry {
   pub name: String,
   pub datetime: DateTime<Utc>,
-  pub nutrition: u16,
+  pub nutrition_id: u16,
 }
 
 #[derive(Debug)]
@@ -50,7 +50,7 @@ pub struct JournalManager {
 pub struct DatabaseManager {
   pub settings: SettingsManager,
   pub nutri_data: Vec<NutritionData>,
-  pub history: Vec<DailyInfo>,
+  pub journal: JournalManager,
 
   pub db_path: String,
   pub conn: Connection,
