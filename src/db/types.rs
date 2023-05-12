@@ -43,9 +43,7 @@ pub struct SettingsManager {
   pub settings: HashMap<String, SettingsEntry>,
 }
 
-pub struct JournalManager {
-  pub journal: HashMap<u16, FoodEntry>,
-}
+pub struct JournalManager {}
 
 pub struct DatabaseManager {
   pub settings: SettingsManager,

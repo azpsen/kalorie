@@ -1,4 +1,5 @@
 use anyhow::Error;
+use chrono::NaiveDate;
 use rusqlite::Connection;
 use std::collections::HashMap;
 
@@ -41,7 +42,35 @@ impl DatabaseManager {
     self.journal.insert(entry, &self.conn)
   }
 
-  pub fn get_journal(&self) -> Result<HashMap<u16, FoodEntry>, Error> {
-    self.journal.get()
+  pub fn get_journal_for_day(&mut self, day: NaiveDate) -> Result<HashMap<u16, FoodEntry>, Error> {
+    self.journal.get_day(&self.conn, day)
+  }
+
+  pub fn get_journal_for_week(
+    &mut self,
+    year: u16,
+    week: u16,
+  ) -> Result<HashMap<u16, FoodEntry>, Error> {
+    self.journal.get_week(&self.conn, year, week)
+  }
+
+  pub fn get_journal_for_month(
+    &mut self,
+    year: u16,
+    month: u16,
+  ) -> Result<HashMap<u16, FoodEntry>, Error> {
+    self.journal.get_month(&self.conn, year, month)
+  }
+
+  pub fn get_journal_for_year(&mut self, year: u16) -> Result<HashMap<u16, FoodEntry>, Error> {
+    self.journal.get_year(&self.conn, year)
+  }
+
+  pub fn get_journal_for_range(
+    &mut self,
+    begin_date: NaiveDate,
+    end_date: NaiveDate,
+  ) -> Result<HashMap<u16, FoodEntry>, Error> {
+    self.journal.get_range(&self.conn, begin_date, end_date)
   }
 }
