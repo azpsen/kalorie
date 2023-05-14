@@ -41,9 +41,8 @@ impl JournalManager {
     params: &[T],
   ) -> Result<HashMap<u16, FoodEntry>, Error> {
     let mut j = HashMap::new();
-    let stmt = conn.prepare(&sql);
-    let mut statement = stmt?;
-    let mut journal_vals = statement.query(rusqlite::params_from_iter(params))?;
+    let mut stmt = conn.prepare(&sql)?;
+    let mut journal_vals = stmt.query(rusqlite::params_from_iter(params))?;
 
     while let Some(v) = journal_vals.next()? {
       j.insert(

@@ -1,4 +1,5 @@
 use anyhow::Error;
+use std::collections::HashMap;
 use std::{io, thread, time::Duration};
 
 use crate::db::types::{DatabaseManager, FoodEntry, NutritionEntry};
@@ -25,7 +26,7 @@ fn test(
       let entry = FoodEntry {
         name: "testing".to_string(),
         datetime: t.parse::<chrono::DateTime<chrono::Utc>>()?,
-        nutrition_id: 69,
+        nutrition_id: 1,
       };
       db_man.insert_into_journal(&entry)?;
     }
@@ -69,19 +70,17 @@ fn test(
   if populate_nutrition {
     let avocado = NutritionEntry {
       name: "Avocado".to_string(),
-      serv_size: 100.0,
-      calories: 160,
-      protein: Some(2.0),
-      fat_total: Some(14.7),
-      fat_sat: None,
-      fat_trans: None,
-      cholesterol: None,
-      carbs_total: Some(8.5),
-      fiber: Some(6.7),
-      sugar: None,
-      carbs_net: Some(1.8),
-      sodium: Some(7.0),
-      potassium: Some(485.0),
+      data: HashMap::from([
+        ("serv_size".to_string(), 100.0),
+        ("calories".to_string(), 160.0),
+        ("protein".to_string(), 2.0),
+        ("fat_total".to_string(), 14.7),
+        ("carbs_total".to_string(), 8.5),
+        ("fiber".to_string(), 6.7),
+        ("carbs_net".to_string(), 1.8),
+        ("sodium".to_string(), 7.0),
+        ("potassium".to_string(), 485.0),
+      ]),
     };
 
     println!("Populating nutrition database...");

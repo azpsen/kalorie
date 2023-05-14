@@ -10,10 +10,27 @@ pub struct UserSettings {
   pub target_carbs: u16,
 }
 
+pub static NUTRITION_VALUES: [&str; 13] = [
+  "serv_size",
+  "calories",
+  "protein",
+  "fat_total",
+  "fat_sat",
+  "fat_trans",
+  "cholesterol",
+  "carbs_total",
+  "fiber",
+  "sugar",
+  "carbs_net",
+  "sodium",
+  "potassium",
+];
+
 #[derive(Debug)]
 pub struct NutritionEntry {
   pub name: String,
-  pub serv_size: f64,
+  pub data: HashMap<String, f64>,
+  /*pub serv_size: f64,
   pub calories: u16,
   pub protein: Option<f64>,
   pub fat_total: Option<f64>,
@@ -25,13 +42,15 @@ pub struct NutritionEntry {
   pub sugar: Option<f64>,
   pub carbs_net: Option<f64>,
   pub sodium: Option<f64>,
-  pub potassium: Option<f64>,
+  pub potassium: Option<f64>,*/
 }
 
 impl NutritionEntry {
   pub fn new() -> Self {
     Self {
       name: "".to_string(),
+      data: HashMap::new(),
+      /*
       serv_size: 100.0,
       calories: 0,
       protein: None,
@@ -44,7 +63,7 @@ impl NutritionEntry {
       sugar: None,
       carbs_net: None,
       sodium: None,
-      potassium: None,
+      potassium: None,*/
     }
   }
 }

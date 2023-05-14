@@ -1,5 +1,6 @@
 use anyhow::Error;
 use rusqlite::Connection;
+use std::collections::HashMap;
 
 use super::types::*;
 
@@ -21,7 +22,7 @@ impl NutritionManager {
           id integer primary key autoincrement,
           name text,
           serv_size real,
-          calories integer,
+          calories real,
           protein real,
           fat_total real,
           fat_sat real,
@@ -47,11 +48,22 @@ impl NutritionManager {
     let stmt = conn.prepare("select * from nutrition where id=?1");
     let mut statement = stmt?;
 
-    let mut data = NutritionEntry::new();
+    let mut result = NutritionEntry::new();
     let mut nutrition_vals = statement.query(&[&id])?;
 
     while let Some(v) = nutrition_vals.next()? {
-      // TODO mapping option?
+      for (i, name) in NUTRITION_VALUES.iter().enumerate() {
+        let a: Option<f64> = v.get(i + 2)?;
+        match v.get(i + 2)? {
+          Some(x) => {
+            result.data.insert(name.to_string(), x);
+          }
+          None => (),
+        }
+        result.name = v.get(1)?;
+      }
+
+      /*      // TODO mapping option?
       data.name = v.get(1)?;
       data.serv_size = v.get(2)?;
       data.calories = v.get(3)?;
@@ -65,15 +77,13 @@ impl NutritionManager {
       data.sugar = v.get(11)?;
       data.carbs_net = v.get(12)?;
       data.sodium = v.get(13)?;
-      data.potassium = v.get(14)?;
+      data.potassium = v.get(14)?;*/
     }
 
-    Ok(data)
+    Ok(result)
   }
 
   pub fn insert(&self, conn: &Connection, entry: &NutritionEntry) -> Result<(), Error> {
-    // TOOD mapping option?
-    println!("Inserting...");
     let mut stmt = conn.prepare(
       "insert into nutrition (
         name,
@@ -96,22 +106,16 @@ impl NutritionManager {
     )?;
 
     println!("Statement prepared, executing...");
-    stmt.execute((
-      &entry.name,
-      &entry.serv_size,
-      &entry.calories,
-      &entry.protein,
-      &entry.fat_total,
-      &entry.fat_sat,
-      &entry.fat_trans,
-      &entry.cholesterol,
-      &entry.carbs_total,
-      &entry.fiber,
-      &entry.sugar,
-      &entry.carbs_net,
-      &entry.sodium,
-      &entry.potassium,
-    ))?;
+    let mut params = Vec::<Option<rusqlite::types::Value>>::new();
+    params.push(Some(entry.name.clone().into()));
+    for val in NUTRITION_VALUES {
+      params.push(match entry.data.get(val) {
+        Some(x) => Some((*x).into()),
+        None => None,
+      });
+    }
+
+    stmt.execute(rusqlite::params_from_iter(params))?;
 
     println!("Statement executed successfully!");
 
