@@ -89,8 +89,12 @@ fn test(
 
   if test_nutrition {
     println!("Testing nutrition database...");
-    let avocado = db_man.get_nutridata(1);
+    let avocado = db_man.get_nutridata(1)?;
     println!("{:#?}", avocado);
+
+    println!("Testing nutrition value conversion...");
+    let avocado_500g = avocado.vals_per_amt(500.0);
+    println!("{:#?}", avocado_500g);
   }
 
   Ok(())
@@ -103,7 +107,7 @@ fn main() -> Result<(), Error> {
   let settings = db_man.settings.get()?;
   println!("Loaded settings:\n{:#?}", settings);
 
-  test(&mut db_man, false, false, true, true)?;
+  test(&mut db_man, false, false, false, true)?;
 
   Ok(())
 }

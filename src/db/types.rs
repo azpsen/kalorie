@@ -30,42 +30,6 @@ pub static NUTRITION_VALUES: [&str; 13] = [
 pub struct NutritionEntry {
   pub name: String,
   pub data: HashMap<String, f64>,
-  /*pub serv_size: f64,
-  pub calories: u16,
-  pub protein: Option<f64>,
-  pub fat_total: Option<f64>,
-  pub fat_sat: Option<f64>,
-  pub fat_trans: Option<f64>,
-  pub cholesterol: Option<f64>,
-  pub carbs_total: Option<f64>,
-  pub fiber: Option<f64>,
-  pub sugar: Option<f64>,
-  pub carbs_net: Option<f64>,
-  pub sodium: Option<f64>,
-  pub potassium: Option<f64>,*/
-}
-
-impl NutritionEntry {
-  pub fn new() -> Self {
-    Self {
-      name: "".to_string(),
-      data: HashMap::new(),
-      /*
-      serv_size: 100.0,
-      calories: 0,
-      protein: None,
-      fat_total: None,
-      fat_sat: None,
-      fat_trans: None,
-      cholesterol: None,
-      carbs_total: None,
-      fiber: None,
-      sugar: None,
-      carbs_net: None,
-      sodium: None,
-      potassium: None,*/
-    }
-  }
 }
 
 #[derive(Debug, Clone)]

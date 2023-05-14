@@ -3,4 +3,6 @@ pub mod journal_manager;
 pub mod nutrition_manager;
 pub mod settings_manager;
 
+pub mod nutrition_entry;
+
 pub mod types;
