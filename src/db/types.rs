@@ -11,12 +11,42 @@ pub struct UserSettings {
 }
 
 #[derive(Debug)]
-pub struct NutritionData {
-  pub id: u16,
+pub struct NutritionEntry {
   pub name: String,
+  pub serv_size: f64,
   pub calories: u16,
-  pub carbs: u16,
-  pub sodium: u16,
+  pub protein: Option<f64>,
+  pub fat_total: Option<f64>,
+  pub fat_sat: Option<f64>,
+  pub fat_trans: Option<f64>,
+  pub cholesterol: Option<f64>,
+  pub carbs_total: Option<f64>,
+  pub fiber: Option<f64>,
+  pub sugar: Option<f64>,
+  pub carbs_net: Option<f64>,
+  pub sodium: Option<f64>,
+  pub potassium: Option<f64>,
+}
+
+impl NutritionEntry {
+  pub fn new() -> Self {
+    Self {
+      name: "".to_string(),
+      serv_size: 100.0,
+      calories: 0,
+      protein: None,
+      fat_total: None,
+      fat_sat: None,
+      fat_trans: None,
+      cholesterol: None,
+      carbs_total: None,
+      fiber: None,
+      sugar: None,
+      carbs_net: None,
+      sodium: None,
+      potassium: None,
+    }
+  }
 }
 
 #[derive(Debug, Clone)]
@@ -45,9 +75,11 @@ pub struct SettingsManager {
 
 pub struct JournalManager {}
 
+pub struct NutritionManager {}
+
 pub struct DatabaseManager {
   pub settings: SettingsManager,
-  pub nutri_data: Vec<NutritionData>,
+  pub nutri_data: NutritionManager,
   pub journal: JournalManager,
 
   pub db_path: String,

@@ -11,20 +11,20 @@ impl DatabaseManager {
     let c = Connection::open(&db_path)?;
     println!("Successfully opened database\n");
 
-    Ok(Self {
+    let mut s = Self {
       settings: SettingsManager::new(),
-      nutri_data: Vec::new(),
+      nutri_data: NutritionManager::new(),
       journal: JournalManager::new(),
       db_path: db_path,
       conn: c,
-    })
+    };
+    s.settings.load(&s.conn)?;
+    s.journal.load(&s.conn)?;
+    s.nutri_data.load(&s.conn)?;
+    Ok(s)
   }
 
   /* SETTINGS MANAGEMENT */
-  pub fn load_settings(&mut self) -> Result<(), Error> {
-    self.settings.load(&self.conn)
-  }
-
   pub fn write_settings(&mut self, id: &str, val: &str) -> Result<(), Error> {
     self.settings.write(id, val, &self.conn)
   }
@@ -34,10 +34,6 @@ impl DatabaseManager {
   }
 
   /* JOURNAL MANAGEMENT */
-  pub fn load_journal(&mut self) -> Result<(), Error> {
-    self.journal.load(&self.conn)
-  }
-
   pub fn insert_into_journal(&mut self, entry: &FoodEntry) -> Result<(), Error> {
     self.journal.insert(entry, &self.conn)
   }
@@ -72,5 +68,14 @@ impl DatabaseManager {
     end_date: NaiveDate,
   ) -> Result<HashMap<u16, FoodEntry>, Error> {
     self.journal.get_range(&self.conn, begin_date, end_date)
+  }
+
+  /* NUTRITION MANAGEMENT */
+  pub fn get_nutridata(&mut self, id: u16) -> Result<NutritionEntry, Error> {
+    self.nutri_data.get(&self.conn, id)
+  }
+
+  pub fn insert_into_nutridata(&mut self, entry: &NutritionEntry) -> Result<(), Error> {
+    self.nutri_data.insert(&self.conn, entry)
   }
 }
