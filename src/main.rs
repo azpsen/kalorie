@@ -7,7 +7,7 @@ use crate::db::types::{DatabaseManager, FoodEntry, NutritionEntry};
 pub mod db;
 mod ui;
 
-fn populate_entries(db_man: &DatabaseManager) {
+fn populate_entries(db_man: &mut DatabaseManager) -> Result<(), Error> {
   let tests = [
     "2012-12-12T12:12:12Z",
     "2018-12-12T12:12:12Z",
@@ -24,9 +24,11 @@ fn populate_entries(db_man: &DatabaseManager) {
     };
     db_man.insert_into_journal(&entry)?;
   }
+
+  Ok(())
 }
 
-fn populate_nutrition(db_man: &DatabaseManager) {
+fn populate_nutrition(db_man: &mut DatabaseManager) -> Result<(), Error> {
   let avocado = NutritionEntry {
     name: "Avocado".to_string(),
     amount: 100.0,
@@ -45,9 +47,11 @@ fn populate_nutrition(db_man: &DatabaseManager) {
 
   println!("Populating nutrition database...");
   db_man.insert_into_nutridata(&avocado)?;
+
+  Ok(())
 }
 
-fn test_entries(db_man: &DatabaseManager) -> Result<(), Error> {
+fn test_entries(db_man: &mut DatabaseManager) -> Result<(), Error> {
   let journal = db_man.get_journal_for_day(chrono::Utc::now().date_naive())?;
   println!("\nJournal for today:\n");
   for (k, v) in journal {
@@ -84,7 +88,7 @@ fn test_entries(db_man: &DatabaseManager) -> Result<(), Error> {
   Ok(())
 }
 
-fn test_nutrition(db_man: &DatabaseManager) -> Result<(), Error> {
+fn test_nutrition(db_man: &mut DatabaseManager) -> Result<(), Error> {
   println!("Testing nutrition database...");
   let avocado = db_man.get_nutridata(1)?;
   println!("{:#?}", avocado);
@@ -107,11 +111,11 @@ fn main() -> Result<(), Error> {
   let settings = db_man.settings.get()?;
   println!("Loaded settings:\n{:#?}", settings);
 
-  // populate_entries(&mut db_man);
-  // populate_nutrition(&mut db_man);
+  // populate_entries(&mut db_man)?;
+  // populate_nutrition(&mut db_man)?;
 
-  // test_entries(&mut db_man);
-  test_nutrition(&mut db_man);
+  // test_entries(&mut db_man)?;
+  test_nutrition(&mut db_man)?;
 
   Ok(())
 }
