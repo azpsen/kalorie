@@ -1,0 +1,6 @@
+/.vscode
+/.vscode/*
+/target
+/target/*
+/Cargo.lock
+/kalorie.db
