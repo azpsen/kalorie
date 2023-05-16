@@ -23,6 +23,7 @@ impl JournalManager {
           id integer primary key autoincrement,
           name text,
           entry_datetime text,
+          amount real,
           nutrition_id integer
         )",
         (),
@@ -50,7 +51,8 @@ impl JournalManager {
         FoodEntry {
           name: v.get(1)?,
           datetime: v.get(2)?,
-          nutrition_id: v.get(3)?,
+          amount: v.get(3)?,
+          nutrition_id: v.get(4)?,
         },
       );
     }
@@ -133,13 +135,19 @@ impl JournalManager {
       "insert into journal ( 
         name,
         entry_datetime,
+        amount,
         nutrition_id
       ) values (
-        ?1, ?2, ?3
+        ?1, ?2, ?3, ?4
       )",
     )?;
 
-    stmt.execute((&entry.name, &entry.datetime, &entry.nutrition_id))?;
+    stmt.execute((
+      &entry.name,
+      &entry.datetime,
+      &entry.amount,
+      &entry.nutrition_id,
+    ))?;
 
     Ok(())
   }

@@ -26,6 +26,7 @@ fn test(
       let entry = FoodEntry {
         name: "testing".to_string(),
         datetime: t.parse::<chrono::DateTime<chrono::Utc>>()?,
+        amount: 100.0,
         nutrition_id: 1,
       };
       db_man.insert_into_journal(&entry)?;
@@ -70,8 +71,9 @@ fn test(
   if populate_nutrition {
     let avocado = NutritionEntry {
       name: "Avocado".to_string(),
+      amount: 100.0,
+      serv_size: 200.0,
       data: HashMap::from([
-        ("serv_size".to_string(), 100.0),
         ("calories".to_string(), 160.0),
         ("protein".to_string(), 2.0),
         ("fat_total".to_string(), 14.7),
@@ -94,7 +96,11 @@ fn test(
 
     println!("Testing nutrition value conversion...");
     let avocado_500g = avocado.vals_per_amt(500.0);
-    println!("{:#?}", avocado_500g);
+    println!("Avocado macros per 500g: {:#?}", avocado_500g);
+
+    println!("Testing nutrition value per serving...");
+    let avocado_serv = avocado.per_serving();
+    println!("Avocado macros per serving: {:#?}", avocado_serv);
   }
 
   Ok(())
@@ -107,7 +113,7 @@ fn main() -> Result<(), Error> {
   let settings = db_man.settings.get()?;
   println!("Loaded settings:\n{:#?}", settings);
 
-  test(&mut db_man, false, false, false, true)?;
+  test(&mut db_man, true, true, true, true)?;
 
   Ok(())
 }

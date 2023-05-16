@@ -10,8 +10,9 @@ pub struct UserSettings {
   pub target_carbs: u16,
 }
 
-pub static NUTRITION_VALUES: [&str; 13] = [
+pub static NUTRITION_VALUES: [&str; 14] = [
   "serv_size",
+  "amount",
   "calories",
   "protein",
   "fat_total",
@@ -29,6 +30,8 @@ pub static NUTRITION_VALUES: [&str; 13] = [
 #[derive(Debug)]
 pub struct NutritionEntry {
   pub name: String,
+  pub amount: f64,
+  pub serv_size: f64,
   pub data: HashMap<String, f64>,
 }
 
@@ -36,6 +39,7 @@ pub struct NutritionEntry {
 pub struct FoodEntry {
   pub name: String,
   pub datetime: DateTime<Utc>,
+  pub amount: f64,
   pub nutrition_id: u16,
 }
 

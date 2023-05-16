@@ -1,6 +1,5 @@
 use anyhow::Error;
 use rusqlite::Connection;
-use std::collections::HashMap;
 
 use super::types::*;
 
@@ -21,6 +20,7 @@ impl NutritionManager {
         "create table nutrition (
           id integer primary key autoincrement,
           name text,
+          amount real,
           serv_size real,
           calories real,
           protein real,
@@ -53,31 +53,22 @@ impl NutritionManager {
 
     while let Some(v) = nutrition_vals.next()? {
       for (i, name) in NUTRITION_VALUES.iter().enumerate() {
-        let a: Option<f64> = v.get(i + 2)?;
         match v.get(i + 2)? {
           Some(x) => {
-            result.data.insert(name.to_string(), x);
+            let n = name.to_string();
+            println!("{n}");
+            if n == "amount" {
+              result.amount = x;
+            } else if n == "serv_size" {
+              result.serv_size = x;
+            } else {
+              result.data.insert(n, x);
+            }
           }
           None => (),
         }
         result.name = v.get(1)?;
       }
-
-      /*      // TODO mapping option?
-      data.name = v.get(1)?;
-      data.serv_size = v.get(2)?;
-      data.calories = v.get(3)?;
-      data.protein = v.get(4)?;
-      data.fat_total = v.get(5)?;
-      data.fat_sat = v.get(6)?;
-      data.fat_trans = v.get(7)?;
-      data.cholesterol = v.get(8)?;
-      data.carbs_total = v.get(9)?;
-      data.fiber = v.get(10)?;
-      data.sugar = v.get(11)?;
-      data.carbs_net = v.get(12)?;
-      data.sodium = v.get(13)?;
-      data.potassium = v.get(14)?;*/
     }
 
     Ok(result)
@@ -87,6 +78,7 @@ impl NutritionManager {
     let mut stmt = conn.prepare(
       "insert into nutrition (
         name,
+        amount,
         serv_size,
         calories,
         protein,
@@ -101,7 +93,7 @@ impl NutritionManager {
         sodium,
         potassium
       ) values (
-        ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14
+        ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15
       )",
     )?;
 
@@ -111,7 +103,15 @@ impl NutritionManager {
     for val in NUTRITION_VALUES {
       params.push(match entry.data.get(val) {
         Some(x) => Some((*x).into()),
-        None => None,
+        None => {
+          if val.to_string() == "amount" {
+            Some(entry.amount.into())
+          } else if val.to_string() == "serv_size" {
+            Some(entry.serv_size.into())
+          } else {
+            None
+          }
+        }
       });
     }
 
