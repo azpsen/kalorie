@@ -71,6 +71,10 @@ impl DatabaseManager {
     JournalManager::get_range(&self.conn, begin_date, end_date)
   }
 
+  pub fn get_journal_for_id(&mut self, id: u16) -> Result<HashMap<u16, FoodEntry>, Error> {
+    JournalManager::get_from_id(&self.conn, id)
+  }
+
   /* NUTRITION MANAGEMENT */
   pub fn get_nutridata(&mut self, id: u16) -> Result<NutritionEntry, Error> {
     NutritionManager::get(&self.conn, id)
