@@ -117,7 +117,15 @@ pub mod JournalManager {
     )?)
   }
 
-  pub fn insert(entry: &FoodEntry, conn: &Connection) -> Result<(), Error> {
+  pub fn get_from_id(conn: &Connection, id: u16) -> Result<HashMap<u16, FoodEntry>, Error> {
+    Ok(get_from_db::<u16>(
+      conn,
+      "select * from journal where id = ?1",
+      &[id],
+    )?)
+  }
+
+  pub fn insert(entry: &FoodEntry, conn: &Connection) -> Result<u16, Error> {
     // Add nutrition entry if it doesn't already exist
     let mut id: u16 = entry.nutrition_id;
     let mut nutrition_data = conn.prepare("select * from nutrition where id=?1")?;
@@ -126,16 +134,7 @@ pub mod JournalManager {
       match &entry.nutrition_data {
         Some(x) => {
           println!("Nutrition data present, inserting...");
-          NutritionManager::insert(conn, &x)?;
-
-          // Get nutrition ID from newly inserted nutrition entry
-          let rowid = conn.last_insert_rowid();
-          let mut stmt = conn.prepare("select id from nutrition where rowid=?1")?;
-          let mut result = stmt.query(&[&rowid])?;
-
-          while let Some(row) = result.next()? {
-            id = row.get(0)?;
-          }
+          id = NutritionManager::insert(conn, &x)?;
         }
         None => {}
       }
@@ -150,11 +149,16 @@ pub mod JournalManager {
         nutrition_id
       ) values (
         ?1, ?2, ?3, ?4
-      )",
+      ) returning id",
     )?;
 
-    stmt.execute((&entry.name, &entry.datetime, &entry.amount, &id))?;
+    let mut result = stmt.query((&entry.name, &entry.datetime, &entry.amount, &id))?;
+    let mut id = 0;
 
-    Ok(())
+    while let Some(row) = result.next()? {
+      id = row.get(0)?;
+    }
+
+    Ok(id)
   }
 }

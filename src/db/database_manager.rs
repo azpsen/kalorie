@@ -35,7 +35,7 @@ impl DatabaseManager {
   }
 
   /* JOURNAL MANAGEMENT */
-  pub fn insert_into_journal(&mut self, entry: &FoodEntry) -> Result<(), Error> {
+  pub fn insert_into_journal(&mut self, entry: &FoodEntry) -> Result<u16, Error> {
     JournalManager::insert(entry, &self.conn)
   }
 
@@ -76,7 +76,7 @@ impl DatabaseManager {
     NutritionManager::get(&self.conn, id)
   }
 
-  pub fn insert_into_nutridata(&mut self, entry: &NutritionEntry) -> Result<(), Error> {
+  pub fn insert_into_nutridata(&mut self, entry: &NutritionEntry) -> Result<u16, Error> {
     NutritionManager::insert(&self.conn, entry)
   }
 }

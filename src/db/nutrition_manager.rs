@@ -65,7 +65,8 @@ pub mod NutritionManager {
     Ok(result)
   }
 
-  pub fn insert(conn: &Connection, entry: &NutritionEntry) -> Result<(), Error> {
+  pub fn insert(conn: &Connection, entry: &NutritionEntry) -> Result<u16, Error> {
+    // Insert nutrition entry into db, returns id of new entry
     let mut stmt = conn.prepare(
       "insert into nutrition (
         name,
@@ -85,7 +86,7 @@ pub mod NutritionManager {
         potassium
       ) values (
         ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15
-      )",
+      ) returning id",
     )?;
 
     println!("Statement prepared, executing...");
@@ -100,10 +101,14 @@ pub mod NutritionManager {
       });
     }
 
-    stmt.execute(rusqlite::params_from_iter(params))?;
+    let mut result = stmt.query(rusqlite::params_from_iter(params))?;
+    let mut id = 0;
+    while let Some(row) = result.next()? {
+      id = row.get(0)?;
+    }
 
     println!("Statement executed successfully!");
 
-    Ok(())
+    Ok(id)
   }
 }
