@@ -53,21 +53,15 @@ impl NutritionManager {
 
     while let Some(v) = nutrition_vals.next()? {
       for (i, name) in NUTRITION_VALUES.iter().enumerate() {
-        match v.get(i + 2)? {
+        match v.get(i + 4)? {
           Some(x) => {
-            let n = name.to_string();
-            println!("{n}");
-            if n == "amount" {
-              result.amount = x;
-            } else if n == "serv_size" {
-              result.serv_size = x;
-            } else {
-              result.data.insert(n, x);
-            }
+            result.data.insert(name.to_string(), x);
           }
           None => (),
         }
         result.name = v.get(1)?;
+        result.amount = v.get(2)?;
+        result.serv_size = v.get(3)?;
       }
     }
 
@@ -100,18 +94,12 @@ impl NutritionManager {
     println!("Statement prepared, executing...");
     let mut params = Vec::<Option<rusqlite::types::Value>>::new();
     params.push(Some(entry.name.clone().into()));
+    params.push(Some(entry.amount.into()));
+    params.push(Some(entry.serv_size.into()));
     for val in NUTRITION_VALUES {
-      params.push(match entry.data.get(val) {
+      params.push(match entry.data.get(&val.to_string()) {
         Some(x) => Some((*x).into()),
-        None => {
-          if val.to_string() == "amount" {
-            Some(entry.amount.into())
-          } else if val.to_string() == "serv_size" {
-            Some(entry.serv_size.into())
-          } else {
-            None
-          }
-        }
+        None => None,
       });
     }
 

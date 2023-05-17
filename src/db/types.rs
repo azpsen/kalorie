@@ -10,9 +10,7 @@ pub struct UserSettings {
   pub target_carbs: u16,
 }
 
-pub static NUTRITION_VALUES: [&str; 14] = [
-  "serv_size",
-  "amount",
+pub static NUTRITION_VALUES: [&str; 12] = [
   "calories",
   "protein",
   "fat_total",

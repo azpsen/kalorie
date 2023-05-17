@@ -111,10 +111,10 @@ fn main() -> Result<(), Error> {
   let settings = db_man.settings.get()?;
   println!("Loaded settings:\n{:#?}", settings);
 
-  // populate_entries(&mut db_man)?;
-  // populate_nutrition(&mut db_man)?;
+  populate_entries(&mut db_man)?;
+  populate_nutrition(&mut db_man)?;
 
-  // test_entries(&mut db_man)?;
+  test_entries(&mut db_man)?;
   test_nutrition(&mut db_man)?;
 
   Ok(())
