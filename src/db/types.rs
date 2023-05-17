@@ -25,7 +25,7 @@ pub static NUTRITION_VALUES: [&str; 12] = [
   "potassium",
 ];
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NutritionEntry {
   pub name: String,
   pub amount: f64,
@@ -39,6 +39,7 @@ pub struct FoodEntry {
   pub datetime: DateTime<Utc>,
   pub amount: f64,
   pub nutrition_id: u16,
+  pub nutrition_data: Option<NutritionEntry>,
 }
 
 #[derive(Debug)]
@@ -58,14 +59,8 @@ pub struct SettingsManager {
   pub settings: HashMap<String, SettingsEntry>,
 }
 
-pub struct JournalManager {}
-
-pub struct NutritionManager {}
-
 pub struct DatabaseManager {
   pub settings: SettingsManager,
-  pub nutri_data: NutritionManager,
-  pub journal: JournalManager,
 
   pub db_path: String,
   pub conn: Connection,

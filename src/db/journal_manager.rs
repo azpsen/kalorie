@@ -1,16 +1,14 @@
-use anyhow::Error;
-use chrono::NaiveDate;
-use rusqlite::Connection;
-use std::collections::HashMap;
+pub mod JournalManager {
 
-use super::types::*;
+  use anyhow::Error;
+  use chrono::NaiveDate;
+  use rusqlite::Connection;
+  use std::collections::HashMap;
 
-impl JournalManager {
-  pub fn new() -> Self {
-    Self {}
-  }
+  use crate::db::nutrition_manager::*;
+  use crate::db::types::*;
 
-  pub fn load(&mut self, conn: &Connection) -> Result<(), Error> {
+  pub fn load(conn: &Connection) -> Result<(), Error> {
     // Check if 'journal' table exists
     let mut journal_table =
       conn.prepare("select * from sqlite_master where type='table' and name='journal'")?;
@@ -36,7 +34,6 @@ impl JournalManager {
   }
 
   fn get_from_db<T: rusqlite::ToSql>(
-    &mut self,
     conn: &Connection,
     sql: &str,
     params: &[T],
@@ -53,6 +50,7 @@ impl JournalManager {
           datetime: v.get(2)?,
           amount: v.get(3)?,
           nutrition_id: v.get(4)?,
+          nutrition_data: Some(NutritionManager::get(conn, v.get(4)?)?),
         },
       );
     }
@@ -60,13 +58,9 @@ impl JournalManager {
     Ok(j)
   }
 
-  pub fn get_day(
-    &mut self,
-    conn: &Connection,
-    day: NaiveDate,
-  ) -> Result<HashMap<u16, FoodEntry>, Error> {
+  pub fn get_day(conn: &Connection, day: NaiveDate) -> Result<HashMap<u16, FoodEntry>, Error> {
     println!("Loading for day {:#?}", day);
-    Ok(self.get_from_db::<NaiveDate>(
+    Ok(get_from_db::<NaiveDate>(
       conn,
       "select * from journal where date(entry_datetime)=date(?1)",
       &[day],
@@ -74,12 +68,11 @@ impl JournalManager {
   }
 
   pub fn get_week(
-    &mut self,
     conn: &Connection,
     year: u16,
     week: u16,
   ) -> Result<HashMap<u16, FoodEntry>, Error> {
-    Ok(self.get_from_db::<u16>(
+    Ok(get_from_db::<u16>(
       conn,
       "select * from journal where
         cast(strftime('%Y', entry_datetime) as str)=cast(?1 as str) and
@@ -89,12 +82,11 @@ impl JournalManager {
   }
 
   pub fn get_month(
-    &mut self,
     conn: &Connection,
     year: u16,
     month: u16,
   ) -> Result<HashMap<u16, FoodEntry>, Error> {
-    Ok(self.get_from_db::<u16>(
+    Ok(get_from_db::<u16>(
       conn,
       "select * from journal where
         cast(strftime('%Y', entry_datetime) as str)=cast(?1 as str) and
@@ -103,12 +95,8 @@ impl JournalManager {
     )?)
   }
 
-  pub fn get_year(
-    &mut self,
-    conn: &Connection,
-    year: u16,
-  ) -> Result<HashMap<u16, FoodEntry>, Error> {
-    Ok(self.get_from_db::<u16>(
+  pub fn get_year(conn: &Connection, year: u16) -> Result<HashMap<u16, FoodEntry>, Error> {
+    Ok(get_from_db::<u16>(
       conn,
       "select * from journal where
         cast(strftime('%Y', entry_datetime) as str)=cast(?1 as str)",
@@ -117,12 +105,11 @@ impl JournalManager {
   }
 
   pub fn get_range(
-    &mut self,
     conn: &Connection,
     begin_date: NaiveDate,
     end_date: NaiveDate,
   ) -> Result<HashMap<u16, FoodEntry>, Error> {
-    Ok(self.get_from_db::<NaiveDate>(
+    Ok(get_from_db::<NaiveDate>(
       conn,
       "select * from journal where
         date(entry_datetime) between ?1 and ?2",
@@ -130,7 +117,7 @@ impl JournalManager {
     )?)
   }
 
-  pub fn insert(&mut self, entry: &FoodEntry, conn: &Connection) -> Result<(), Error> {
+  pub fn insert(entry: &FoodEntry, conn: &Connection) -> Result<(), Error> {
     let mut stmt = conn.prepare(
       "insert into journal ( 
         name,

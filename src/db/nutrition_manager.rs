@@ -1,14 +1,11 @@
-use anyhow::Error;
-use rusqlite::Connection;
+pub mod NutritionManager {
 
-use super::types::*;
+  use anyhow::Error;
+  use rusqlite::Connection;
 
-impl NutritionManager {
-  pub fn new() -> Self {
-    Self {}
-  }
+  use crate::db::types::*;
 
-  pub fn load(&mut self, conn: &Connection) -> Result<(), Error> {
+  pub fn load(conn: &Connection) -> Result<(), Error> {
     // Check if 'nutrition' table exists
     let mut nutrition_table =
       conn.prepare("select * from sqlite_master where type='table' and name='nutrition'")?;
@@ -44,7 +41,7 @@ impl NutritionManager {
     Ok(())
   }
 
-  pub fn get(&self, conn: &Connection, id: u16) -> Result<NutritionEntry, Error> {
+  pub fn get(conn: &Connection, id: u16) -> Result<NutritionEntry, Error> {
     let stmt = conn.prepare("select * from nutrition where id=?1");
     let mut statement = stmt?;
 
@@ -68,7 +65,7 @@ impl NutritionManager {
     Ok(result)
   }
 
-  pub fn insert(&self, conn: &Connection, entry: &NutritionEntry) -> Result<(), Error> {
+  pub fn insert(conn: &Connection, entry: &NutritionEntry) -> Result<(), Error> {
     let mut stmt = conn.prepare(
       "insert into nutrition (
         name,

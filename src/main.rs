@@ -21,6 +21,7 @@ fn populate_entries(db_man: &mut DatabaseManager) -> Result<(), Error> {
       datetime: t.parse::<chrono::DateTime<chrono::Utc>>()?,
       amount: 100.0,
       nutrition_id: 1,
+      nutrition_data: None,
     };
     db_man.insert_into_journal(&entry)?;
   }
