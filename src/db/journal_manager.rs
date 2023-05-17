@@ -118,6 +118,30 @@ pub mod JournalManager {
   }
 
   pub fn insert(entry: &FoodEntry, conn: &Connection) -> Result<(), Error> {
+    // Add nutrition entry if it doesn't already exist
+    let mut id: u16 = entry.nutrition_id;
+    let mut nutrition_data = conn.prepare("select * from nutrition where id=?1")?;
+    if !nutrition_data.exists(&[&id])? {
+      println!("Nutrition data does not exist, attempting to insert...");
+      match &entry.nutrition_data {
+        Some(x) => {
+          println!("Nutrition data present, inserting...");
+          NutritionManager::insert(conn, &x)?;
+
+          // Get nutrition ID from newly inserted nutrition entry
+          let rowid = conn.last_insert_rowid();
+          let mut stmt = conn.prepare("select id from nutrition where rowid=?1")?;
+          let mut result = stmt.query(&[&rowid])?;
+
+          while let Some(row) = result.next()? {
+            id = row.get(0)?;
+          }
+        }
+        None => {}
+      }
+    }
+
+    // Add food entry to journal
     let mut stmt = conn.prepare(
       "insert into journal ( 
         name,
@@ -129,12 +153,7 @@ pub mod JournalManager {
       )",
     )?;
 
-    stmt.execute((
-      &entry.name,
-      &entry.datetime,
-      &entry.amount,
-      &entry.nutrition_id,
-    ))?;
+    stmt.execute((&entry.name, &entry.datetime, &entry.amount, &id))?;
 
     Ok(())
   }

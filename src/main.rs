@@ -1,4 +1,4 @@
-use anyhow::Error;
+use anyhow::{Error, Result};
 use std::collections::HashMap;
 use std::{io, thread, time::Duration};
 
@@ -8,6 +8,8 @@ pub mod db;
 mod ui;
 
 fn populate_entries(db_man: &mut DatabaseManager) -> Result<(), Error> {
+  println!("Populating journal entries...");
+
   let tests = [
     "2012-12-12T12:12:12Z",
     "2018-12-12T12:12:12Z",
@@ -26,10 +28,14 @@ fn populate_entries(db_man: &mut DatabaseManager) -> Result<(), Error> {
     db_man.insert_into_journal(&entry)?;
   }
 
+  println!("Populated journal entries!");
+
   Ok(())
 }
 
 fn populate_nutrition(db_man: &mut DatabaseManager) -> Result<(), Error> {
+  println!("Populating nutrition table...");
+
   let avocado = NutritionEntry {
     name: "Avocado".to_string(),
     amount: 100.0,
@@ -48,6 +54,47 @@ fn populate_nutrition(db_man: &mut DatabaseManager) -> Result<(), Error> {
 
   println!("Populating nutrition database...");
   db_man.insert_into_nutridata(&avocado)?;
+
+  println!("Populated nutrition table!");
+
+  Ok(())
+}
+
+fn test_nonexistent_nutrition(db_man: &mut DatabaseManager) -> Result<(), Error> {
+  println!("Testing insertion of food with nonexistent nutrition entry...");
+
+  let banana = NutritionEntry {
+    name: "Banana".to_string(),
+    amount: 118.0,
+    serv_size: 118.0,
+    data: HashMap::from([
+      ("calories".to_string(), 105.0),
+      ("protein".to_string(), 1.3),
+      ("fat_total".to_string(), 0.4),
+      ("carbs_total".to_string(), 27.0),
+      ("fiber".to_string(), 3.1),
+      ("sugar".to_string(), 14.0),
+      ("carbs_net".to_string(), 23.9),
+      ("sodium".to_string(), 1.2),
+      ("potassium".to_string(), 422.4),
+    ]),
+  };
+
+  println!("Inserting...");
+  db_man.insert_into_journal(&FoodEntry {
+    name: "Banan".to_string(),
+    datetime: "2023-05-17T15:23:05Z".parse::<chrono::DateTime<chrono::Utc>>()?,
+    amount: 50.0,
+    nutrition_id: 0,
+    nutrition_data: Some(banana),
+  })?;
+
+  println!("Getting entries for day of new entry...");
+  let entries = db_man.get_journal_for_day("2023-05-17".parse::<chrono::NaiveDate>()?)?;
+  println!("Entries: \n");
+  for (k, v) in entries {
+    println!("{k}: {:#?}", v);
+  }
 
   Ok(())
 }
@@ -109,14 +156,16 @@ fn main() -> Result<(), Error> {
   // Load database
   let mut db_man = DatabaseManager::new("kalorie.db".to_string())?;
 
-  let settings = db_man.settings.get()?;
-  println!("Loaded settings:\n{:#?}", settings);
+  //let settings = db_man.settings.get()?;
+  //println!("Loaded settings:\n{:#?}", settings);
 
   populate_entries(&mut db_man)?;
   populate_nutrition(&mut db_man)?;
 
   test_entries(&mut db_man)?;
   test_nutrition(&mut db_man)?;
+
+  test_nonexistent_nutrition(&mut db_man)?;
 
   Ok(())
 }

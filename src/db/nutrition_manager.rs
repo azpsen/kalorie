@@ -15,7 +15,7 @@ pub mod NutritionManager {
       println!("Nutrition table does not exist, creating...");
       conn.execute(
         "create table nutrition (
-          id integer primary key autoincrement,
+          id integer primary key,
           name text,
           amount real,
           serv_size real,
